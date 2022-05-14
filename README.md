@@ -1,45 +1,123 @@
-# Fylo dark theme landing page
+# Fylo Ver. 2
 
-### The challenge
+### What is changed compared to Version 1?
 
-Users should be able to:
+- Using Mapbox API
+- Using MongoDB Connection and MongoDB Atlas
+    - Version 1 was without MongoDB Connection
+- More Boostrap 5 Syntax used
 
-- View the optimal layout for the site depending on their device's screen size
-- See hover states for all interactive elements on the page
+### Ininital Setting to run this project locally
 
-### Screenshot
+You have first to clone your repo:
 
-![Design preview for the Fylo dark theme landing page challenge](./design/desktop-preview.jpg)
+```bash
+git clone https://github.com/mininpark/Ver2_Fylo_darktheme
+```
 
-### Links
+then when the repository has been cloned:
 
-- Live URL : https://mininpark.github.io/Fylo_darktheme/
+```bash
+cd your-destination-folder
+npm install # installing the dependencies
+npm start 
+# or 
+nodemon app.js
+```
+
+If you want to see the static website without NodeJS, Express, MongoDB, please go to version 3. Version 3 is downgraded from version 2. 
+
+[https://github.com/mininpark/Ver3-Fylo-Darkthema](https://github.com/mininpark/Ver3-Fylo-Darkthema)
 
 ## My process
 
 ### Built with
 
-- Node JS with NPM API Express and Mailchimp
-- Body Parser in JS
-- JSON
-- Modern Asynchronous JavaScript with Async and Await
-- Bootstrap and CSS custom properties
-- Mobile-first workflow
-- Semantic HTML5 markup
-- Flexbox
+- MongoDB, Mongo DB Atlas
+- Mapbox API
+- Bootstrap
+    - Modal, Accordion, List, and many different Bootstrap attribution
+- NodeJS, Express
 
 ### What I learned
-I learned to use API (Endpoints, Paths, Parameters, Authentication and Postman) and understanded the logic of JSON. NPM is used here in this project too. 
-GET Requests is used with the NodeHTTPS Module by parsing JSON and Body Parser is used to parser POST Requests to the server (Async/Await).
-Express is used to render a website with Live API Data and Mailchimp API is used to interact with Users by getting email address. Success and Failure Pages for getting email address are also added, when it's going wrong. But in this case, I got the error 401 (unautorised) even after logging in and auth-token being present. 
 
-### Continued development
+CRUD, Express and MongoDB are big words for me who has never touched many server-side programming in life. 
 
-Sutiable changing with Bootstrap 4 with media query
+**[Express](https://expressjs.com/) is a framework for building web applications on top of [Node.js](https://nodejs.org/en/)**. It simplifies the server creation process that is already available in Node. In case you were wondering, Node allows you to use JavaScript as your server-side language.
 
-## Author
+**[MongoDB](https://www.mongodb.com/) is a database**. This is the place where you store information for your websites (or applications).
 
-- Website - [Mina](https://github.com/mininpark/)
+**[CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) is an acronym for Create, Read, Update and Delete**. It is a set of operations we get servers to execute (`POST`, `GET`, `PUT` and `DELETE` requests respectively). This is what each operation does:
 
-**Note: Delete this note and add/remove/edit lines above based on what links you'd like to share.**
+### Users’ Input will be collected and saved in my MongoDB
 
+- Setting with my MongoDB
+
+```jsx
+const MongoClient = require('mongodb').MongoClient
+
+MongoClient.connect('mongodb+srv://admin:admin@<cluster0.tpwst.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
+    useUnifiedTopology: true})
+    .then(client => {
+        console.log("MangoDB Connected")
+        const db = client.db('fylo-database')
+        const fyloCollection = db.collection('fylo')
+
+```
+
+- app.**get** and app.**post**
+
+```jsx
+            //Middlewares and other routes
+            app.use(bodyParser.urlencoded({ extended:true }))
+            app.use(express.static(path.join(__dirname, 'public')))
+
+            app.get('/', (req, res, next) => {
+                res.sendFile(__dirname + '/public/index.html')
+                db.collection('fylo').find().toArray()
+                    .then(results => {
+                        console.log(results)
+                    })
+                    .catch(error => console.log.error(error))
+            });
+//with POST action will be inserted to my fyloCollection
+            app.post('/sent', (req,res) => {
+                fyloCollection.insertOne(req.body)
+                .then(result => {
+                  res.redirect(`/`)
+                  console.log('Data added')
+                })
+                .catch(error => console.error(error))
+            })
+```
+
+- **app.listen**
+
+```jsx
+            const server = app.listen(process.env.PORT || 8080, ()=> {
+                const port = server.address().port;
+                console.log(`Server is working on ${port}`);
+            });
+      })
+    .catch(err => console.log(err))
+```
+
+### Mailbox API
+
+```jsx
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
+  <script>
+    //map
+  mapboxgl.accessToken = 'pk.eyJ1IjoiaHVubWlucGFyayIsImEiOiJjbDM0bmhkNjMwd3A1M2twNXE1czJwdTFhIn0.S1fFg0WMrkWe-tBt3QYX4Q';
+  const map = new mapboxgl.Map({
+  container: 'map', // container ID
+  style: 'mapbox://styles/mapbox/streets-v11', // style URL
+  center: [8.466727780617589,49.48608884048795], // starting position [lng, lat]
+  zoom: 14 // starting zoom
+  })
+  </script>
+```
+
+### Useful resources
+
+- [CRUD Tutorial](https://zellwk.com/blog/crud-express-mongodb/) - This helped me a lot to understand the deeper and wide view of CRUD Web-APP.
